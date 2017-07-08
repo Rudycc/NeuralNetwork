@@ -263,17 +263,15 @@ lr.on('line', function (line) {
 lr.on('end', function () {
     for(var key in initialWeights){
         trainingMatrix[0].forEach((element) => {
-            initialWeights[key].push(Math.random());
+            initialWeights[key].push(-0.1+ 0.2 * Math.random());
         });
     }
 
     for(var key in hiddenWeights){
         for(var key2 in initialWeights){
-            hiddenWeights[key].push(Math.random());
+            hiddenWeights[key].push(-0.1+ 0.2 * Math.random());
         }
     }
-    console.log(hiddenWeights['first']);
-    console.log(hiddenWeights['fifth']);
 
     fs.open('classes.txt', 'wx', (err) => {
         var toWrite = ''
@@ -282,7 +280,7 @@ lr.on('end', function () {
         }
         fs.writeFile('classes.txt',toWrite);
     });
-
+    Neurona.feedForward(trainingMatrix[0],initialWeights, hiddenWeights);
 
     /*var weights = Neurona.trainPerceptron(trainingMatrix, classes);
     weights.forEach((weight)=> {

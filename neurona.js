@@ -2,12 +2,28 @@ var Math = require('mathjs');
 
 
 
-var feedForward = function(bytes, weights){
-    var output = 0;
-    bytes.map((byte, i)=>{
-        output += byte * weights[i]
-    });
-    return output;
+var feedForward = function(bytes, initialWeights, hiddenWeights){
+    //Obtener resultados de las primeras 26 neuronas
+    var hiddenLayerValues = [];
+    for(var key in initialWeights){
+        var dot = 0;
+        bytes.map((byte, i)=>{
+            dot += byte * initialWeights[key][i];
+        });
+        hiddenLayerValues.push(actionFunction(dot));
+    }
+    //Resultados de las primeras neuronas obtenidos
+    var results = [];
+
+    for(var key in hiddenWeights){
+        var output = 0;
+        hiddenLayerValues.forEach((value,i) => {
+            output += value * hiddenWeights[key][i];
+        });
+        results.push(actionFunction(output));
+    }
+    console.log(results);
+    return results;
 };
 
 var actionFunction = function(output){
