@@ -92,14 +92,21 @@ var trainPerceptron = function(trainingMatrix, classes, initialWeights, hiddenWe
             });
         
             
-            if(error.some((element) => { return Math.abs(element) < 0.25; })){
-                hits += 1;
+            if(error.some((element) => { return Math.abs(element) > 0.25; })){
+                var newError = error.map((err) => {
+                    if(Math.abs(err) <= 0.25){
+                        return 0;
+                    }else{
+                        return err;
+                    }
+                });
+                backPropagation(newError, trainingVector, output, initialWeights, hiddenWeights, hiddenLayerValues);
             } else{
-                backPropagation(error, trainingVector, output, initialWeights, hiddenWeights, hiddenLayerValues);
+                hits += 1;
             }
         });
         
-        if (actual >= 200){
+        if (actual >= 3){
             break;
         } else{
             actual++;
