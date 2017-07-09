@@ -1,24 +1,23 @@
-var Math = require('mathjs');
+const Math = require('mathjs');
+const jsonfile = require('jsonfile');
 
-
-
-var feedForward = function(bytes, initialWeights, hiddenWeights, hiddenLayerValues){
+const feedForward = (bytes, initialWeights, hiddenWeights, hiddenLayerValues) => {
     //Obtener resultados de las primeras 26 neuronas
-    var index = 0;
-    for(var key in initialWeights){
-        var dot = 0;
-        bytes.map((byte, i)=>{
+    let index = 0;
+    for (let key in initialWeights) {
+        let dot = 0;
+        bytes.map((byte, i) => {
             dot += byte * initialWeights[key][i];
         });
         hiddenLayerValues[index] = actionFunction(dot);
         index += 1;
     }
     //Resultados de las primeras neuronas obtenidos
-    var results = [];
+    let results = [];
 
-    for(var key in hiddenWeights){
-        var output = 0;
-        hiddenLayerValues.forEach((value,i) => {
+    for (let key in hiddenWeights) {
+        let output = 0;
+        hiddenLayerValues.forEach((value, i) => {
             output += value * hiddenWeights[key][i];
         });
         results.push(actionFunction(output));
@@ -26,51 +25,51 @@ var feedForward = function(bytes, initialWeights, hiddenWeights, hiddenLayerValu
     return results;
 };
 
-var actionFunction = function(output){
+const actionFunction = (output) => {
     return 1.0 / (1 + Math.exp(-output));
 }
 
-var hiddenActionFunction = (output) => {
-    return output > 0.5? 1:0;
+const hiddenActionFunction = (output) => {
+    return output > 0.5 ? 1 : 0;
 }
 
-var dsigmoid = function(output){
-    return output*(1-output);
+const dsigmoid = (output) => {
+    return output * (1 - output);
 }
 
-var backPropagation = function(error, input, output, initialWeights, hiddenWeights, hiddenLayerValues){
+const backPropagation = function (error, input, output, initialWeights, hiddenWeights, hiddenLayerValues) {
     const learningRate = 0.01;
-    var outputDelta = output.map((out,i) => {
+    let outputDelta = output.map((out, i) => {
         return dsigmoid(out) * error[i];
     });
-    var ind = 0;
-    for(var key in hiddenWeights){
-        hiddenWeights[key] = hiddenWeights[key].map((weight,i) => {
+    let ind = 0;
+    for (let key in hiddenWeights) {
+        hiddenWeights[key] = hiddenWeights[key].map((weight, i) => {
             return weight + (hiddenLayerValues[i] * learningRate * outputDelta[ind]);
         });
         ind += 1;
     }
 
     ind = 0;
-    var hiddenDeltas = [];
-    for(var key in hiddenWeights){
-        var delta = hiddenWeights[key].map((weight,i) => {
+    let hiddenDeltas = [];
+    for (let key in hiddenWeights) {
+        let delta = hiddenWeights[key].map((weight, i) => {
             return dsigmoid(hiddenLayerValues[i]) * weight * outputDelta[ind];
         });
         hiddenDeltas.push(delta);
         ind += 1;
     }
-    
+
     ind = 0;
-    for(var key in initialWeights){
-        initialWeights[key] = initialWeights[key].map((initial,i) => {
-            var actual = 0;
+    for (let key in initialWeights) {
+        initialWeights[key] = initialWeights[key].map((initial, i) => {
+            let actual = 0;
             hiddenDeltas.forEach((delta) => {
-                actual += (input[i] * learningRate * delta[ind]); 
+                actual += (input[i] * learningRate * delta[ind]);
             });
-            return initial += (actual/hiddenDeltas.length);
+            return initial += (actual / hiddenDeltas.length);
         });
-        
+
         ind += 1;
     }
 
@@ -79,42 +78,85 @@ var backPropagation = function(error, input, output, initialWeights, hiddenWeigh
     });*/
 }
 
-var trainPerceptron = function(trainingMatrix, classes, initialWeights, hiddenWeights, hiddenLayerValues, values){
-    var hits = 0;
-    var actual = 0;
+const trainPerceptron = function (trainingMatrix, classes, initialWeights, hiddenWeights, hiddenLayerValues, values) {
+    let hits = 0;
+    let actual = 0;
+
     while (trainingMatrix.length > hits) {
         hits = 0;
+
         trainingMatrix.map((trainingVector, i) => {
-            var output = feedForward(trainingVector, initialWeights, hiddenWeights, hiddenLayerValues);
-            var expectedOutput = values[classes[i]];
-            var error = output.map((out,i) => {
+            let output = feedForward(trainingVector, initialWeights, hiddenWeights, hiddenLayerValues);
+            let expectedOutput = values[classes[i]];
+            let error = output.map((out, i) => {
                 return expectedOutput[i] - out;
             });
-        
-            
-            if(error.some((element) => { return Math.abs(element) > 0.25; })){
-                var newError = error.map((err) => {
-                    if(Math.abs(err) <= 0.25){
+
+            if (error.some((element) => { return Math.abs(element) > 0.25; })) {
+                let newError = error.map((err) => {
+                    if (Math.abs(err) <= 0.25) {
                         return 0;
-                    }else{
+                    } else {
                         return err;
                     }
                 });
+
                 backPropagation(newError, trainingVector, output, initialWeights, hiddenWeights, hiddenLayerValues);
-            } else{
+            } else {
                 hits += 1;
             }
         });
-        
-        if (actual >= 3){
+
+        if (actual >= 1) {
             break;
-        } else{
+        } else {
             actual++;
-            console.log('Number of correct hits: '+ hits);
-            console.log((actual/2) + '%');
+            console.log('Number of correct hits: ' + hits);
+            console.log((actual / 2) + '%');
         }
 
     }
+
+    saveWeights(initialWeights, hiddenWeights);
+}
+
+const saveWeights = (initialWeights, hiddenWeights) => {
+    jsonfile.writeFile('./initialWeights.json', initialWeights, (err) => {
+        if (err) {
+            console.log('Error saving initial weights ' + err);
+        }
+    });
+
+    jsonfile.writeFile('./hiddenWeights.json', hiddenWeights, (err) => {
+        if (err) {
+            console.log('Error saving hidden weights ' + err);
+        }
+    });
+}
+
+const readWeights = () => {
+    let weights = {
+        initialWeights: {},
+        hiddenWeights: {}
+    };
+
+    jsonfile.readFile('./initialWeights.json', (err, obj) => {
+        if (!err) {
+            weights.initialWeights = obj;
+        } else {
+            console.log('Error loading initial weights ' + err);
+        }
+    });
+
+    jsonfile.readFile('./hiddenWeights.json', (err, obj) => {
+        if (!err) {
+            weights.hiddenWeights = obj;
+        } else {
+            console.log('Error lowading hidden weights ' + err);
+        }
+    });
+
+    return weights;
 }
 
 module.exports = {
