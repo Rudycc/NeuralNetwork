@@ -69,6 +69,8 @@ var hiddenWeights = {
     fifth:[]
 }
 
+var hiddenLayerValues = [];
+
 const values = {
     a:[0,0,0,0,0],
     b:[0,0,0,0,1],
@@ -97,6 +99,7 @@ const values = {
     y:[1,1,0,0,0],
     z:[1,1,0,0,1]
 };
+var res = [];
 
 fs.open('info.txt', 'wx', (err) => {
     var toWrite = ''
@@ -117,7 +120,8 @@ var cuenta = 0;
 lr.on('line', function (line) {
     if(cuenta < 40000){
         var data = line.split("\t");
-        if(data[1] == 'a'){
+        res.push(data[1]);
+        /*if(data[1] == 'a'){
             classes.a.push(1);
         }else{
             classes.a.push(0);
@@ -246,7 +250,7 @@ lr.on('line', function (line) {
             classes.z.push(1);
         }else{
             classes.z.push(0);
-        }
+        }*/
         var vector = [];
         data.map((number, i) => {
             if(i>=6){
@@ -267,6 +271,10 @@ lr.on('end', function () {
         });
     }
 
+    for(var key in hiddenLayerValues){
+        hiddenLayerValues.push(0);
+    }
+
     for(var key in hiddenWeights){
         for(var key2 in initialWeights){
             hiddenWeights[key].push(-0.1+ 0.2 * Math.random());
@@ -280,8 +288,7 @@ lr.on('end', function () {
         }
         fs.writeFile('classes.txt',toWrite);
     });
-    Neurona.feedForward(trainingMatrix[0],initialWeights, hiddenWeights);
-
+    Neurona.trainPerceptron(trainingMatrix, res, initialWeights, hiddenWeights, hiddenLayerValues, values);
     /*var weights = Neurona.trainPerceptron(trainingMatrix, classes);
     weights.forEach((weight)=> {
         console.log(weight);
