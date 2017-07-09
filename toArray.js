@@ -152,9 +152,12 @@ var testNextVector = (vector,expectedOutput) => {
     var incorrect = values[expectedOutput].some((output,i) => {
         return (results[i] >= 0.5 && output == 0) || (results[i] < 0.5 && output == 1);
     });
-    console.log('expected: ' + expectedOutput);
-    console.log(values[expectedOutput]);
-    console.log('received:' + results);
+    if(!incorrect){
+        console.log('expected: ' + expectedOutput);
+        console.log(values[expectedOutput]);
+        console.log('received:' + results);
+    }
+    
     return incorrect;
 }
 

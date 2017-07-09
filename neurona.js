@@ -92,9 +92,9 @@ var trainPerceptron = function(trainingMatrix, classes, initialWeights, hiddenWe
             });
         
             
-            if(error.some((element) => { return Math.abs(element) > 0.25; })){
+            if(error.some((element) => { return Math.abs(element) > 0.5; })){
                 var newError = error.map((err) => {
-                    if(Math.abs(err) <= 0.25){
+                    if(Math.abs(err) <= 0.5){
                         return 0;
                     }else{
                         return err;
@@ -106,7 +106,7 @@ var trainPerceptron = function(trainingMatrix, classes, initialWeights, hiddenWe
             }
         });
         
-        if (actual >= 3){
+        if (actual >= 5){
             break;
         } else{
             actual++;
