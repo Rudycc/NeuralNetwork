@@ -38,7 +38,7 @@ const dsigmoid = (output) => {
 }
 
 const backPropagation = function (error, input, output, initialWeights, hiddenWeights, hiddenLayerValues) {
-    const learningRate = 0.01;
+    const learningRate = 0.0005;
     let outputDelta = output.map((out, i) => {
         return dsigmoid(out) * error[i];
     });
@@ -49,7 +49,7 @@ const backPropagation = function (error, input, output, initialWeights, hiddenWe
         });
         ind += 1;
     }
-
+    const learningRate2 = 0.003;
     ind = 0;
     let hiddenDeltas = [];
     for (let key in hiddenWeights) {
@@ -65,7 +65,7 @@ const backPropagation = function (error, input, output, initialWeights, hiddenWe
         initialWeights[key] = initialWeights[key].map((initial, i) => {
             let actual = 0;
             hiddenDeltas.forEach((delta) => {
-                actual += (input[i] * learningRate * delta[ind]);
+                actual += (input[i] * learningRate2 * delta[ind]);
             });
             return initial += (actual / hiddenDeltas.length);
         });
@@ -107,12 +107,12 @@ const trainPerceptron = function (trainingMatrix, classes, initialWeights, hidde
             }
         });
         
-        if (actual >= 5){
+        if (actual >= 10){
             break;
         } else {
             actual++;
             console.log('Number of correct hits: ' + hits);
-            console.log((actual / 2) + '%');
+            console.log((actual / 0.1) + '%');
         }
 
     }
@@ -139,9 +139,10 @@ const readWeights = () => {
         initialWeights: {},
         hiddenWeights: {}
     };
-
+    
     jsonfile.readFile('./initialWeights.json', (err, obj) => {
         if (!err) {
+            console.log('one');
             weights.initialWeights = obj;
         } else {
             console.log('Error loading initial weights ' + err);
@@ -150,6 +151,7 @@ const readWeights = () => {
 
     jsonfile.readFile('./hiddenWeights.json', (err, obj) => {
         if (!err) {
+            console.log('two');
             weights.hiddenWeights = obj;
         } else {
             console.log('Error lowading hidden weights ' + err);
@@ -163,4 +165,5 @@ module.exports = {
     feedForward,
     actionFunction,
     trainPerceptron,
+    readWeights,
 }

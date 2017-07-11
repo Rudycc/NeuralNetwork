@@ -104,6 +104,8 @@ let res = [];
 let testMatrix = [];
 let testVector = [];
 
+const getAllWeights = Neurona.readWeights();
+
 fs.open('info.txt', 'wx', (err) => {
     let toWrite = ''
     for (let key in values) {
@@ -154,9 +156,9 @@ const testNextVector = (vector, expectedOutput) => {
         return (results[i] >= 0.5 && output == 0) || (results[i] < 0.5 && output == 1);
     });
     if(!incorrect){
-        console.log('expected: ' + expectedOutput);
+        /*console.log('expected: ' + expectedOutput);
         console.log(values[expectedOutput]);
-        console.log('received:' + results);
+        console.log('received:' + results);*/
     }
     
     return incorrect;
@@ -164,21 +166,25 @@ const testNextVector = (vector, expectedOutput) => {
 
 
 lr.on('end', () => {
-    for (let key in initialWeights) {
+    /*for (let key in initialWeights) {
         trainingMatrix[0].forEach((element) => {
             initialWeights[key].push(-0.1 + 0.2 * Math.random());
         });
-    }
+    }*/
+
+    initialWeights = getAllWeights.initialWeights;
+    hiddenWeights = getAllWeights.hiddenWeights;
+    
 
     for (let key in hiddenLayerValues) {
         hiddenLayerValues.push(0);
     }
 
-    for (let key in hiddenWeights) {
+   /* for (let key in hiddenWeights) {
         for (let key2 in initialWeights) {
             hiddenWeights[key].push(-0.1 + 0.2 * Math.random());
         }
-    }
+    }*/
 
     fs.open('classes.txt', 'wx', (err) => {
         let toWrite = ''
@@ -187,7 +193,6 @@ lr.on('end', () => {
         }
         fs.writeFile('classes.txt', toWrite);
     });
-    Neurona.trainPerceptron(trainingMatrix, res, initialWeights, hiddenWeights, hiddenLayerValues, values);
     let correct = 0;
     let wrong = 0;
     testMatrix.forEach((test, i) => {
@@ -201,6 +206,20 @@ lr.on('end', () => {
     console.log('correctly classified: ' + correct);
     console.log('incorrect guesses: ' + wrong);
 
+    Neurona.trainPerceptron(trainingMatrix, res, initialWeights, hiddenWeights, hiddenLayerValues, values);
+    
+    wrong = 0;
+    correct = 0;
+    testMatrix.forEach((test, i) => {
+        if (testNextVector(test, testVector[i])) {
+            wrong += 1;
+        } else {
+            correct += 1;
+        }
+    });
+
+    console.log('correctly classified: ' + correct);
+    console.log('incorrect guesses: ' + wrong);
     /*let weights = Neurona.trainPerceptron(trainingMatrix, classes);
     weights.forEach((weight)=> {
         console.log(weight);
