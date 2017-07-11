@@ -92,9 +92,9 @@ const trainPerceptron = function (trainingMatrix, classes, initialWeights, hidde
                 return expectedOutput[i] - out;
             });
 
-            if(error.some((element) => { return Math.abs(element) > 0.5; })){
-                var newError = error.map((err) => {
-                    if(Math.abs(err) <= 0.5){
+            if (error.some((element) => { return Math.abs(element) > 0.5; })) {
+                let newError = error.map((err) => {
+                    if (Math.abs(err) <= 0.5) {
                         return 0;
                     } else {
                         return err;
@@ -106,8 +106,8 @@ const trainPerceptron = function (trainingMatrix, classes, initialWeights, hidde
                 hits += 1;
             }
         });
-        
-        if (actual >= 10){
+
+        if (actual >= 10) {
             break;
         } else {
             actual++;
@@ -139,7 +139,7 @@ const readWeights = () => {
         initialWeights: {},
         hiddenWeights: {}
     };
-    
+
     jsonfile.readFile('./initialWeights.json', (err, obj) => {
         if (!err) {
             console.log('one');

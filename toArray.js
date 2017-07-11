@@ -155,12 +155,12 @@ const testNextVector = (vector, expectedOutput) => {
     let incorrect = values[expectedOutput].some((output, i) => {
         return (results[i] >= 0.5 && output == 0) || (results[i] < 0.5 && output == 1);
     });
-    if(!incorrect){
+    if (!incorrect) {
         /*console.log('expected: ' + expectedOutput);
         console.log(values[expectedOutput]);
         console.log('received:' + results);*/
     }
-    
+
     return incorrect;
 }
 
@@ -174,17 +174,17 @@ lr.on('end', () => {
 
     initialWeights = getAllWeights.initialWeights;
     hiddenWeights = getAllWeights.hiddenWeights;
-    
+
 
     for (let key in hiddenLayerValues) {
         hiddenLayerValues.push(0);
     }
 
-   /* for (let key in hiddenWeights) {
-        for (let key2 in initialWeights) {
-            hiddenWeights[key].push(-0.1 + 0.2 * Math.random());
-        }
-    }*/
+    /* for (let key in hiddenWeights) {
+         for (let key2 in initialWeights) {
+             hiddenWeights[key].push(-0.1 + 0.2 * Math.random());
+         }
+     }*/
 
     fs.open('classes.txt', 'wx', (err) => {
         let toWrite = ''
@@ -207,7 +207,7 @@ lr.on('end', () => {
     console.log('incorrect guesses: ' + wrong);
 
     Neurona.trainPerceptron(trainingMatrix, res, initialWeights, hiddenWeights, hiddenLayerValues, values);
-    
+
     wrong = 0;
     correct = 0;
     testMatrix.forEach((test, i) => {
