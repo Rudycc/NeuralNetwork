@@ -1,2 +1,2 @@
 
-  @global-Rudycc @global-GalaxiasKyklos
+*  @Rudycc @GalaxiasKyklos
